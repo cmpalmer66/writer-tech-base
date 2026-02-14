@@ -51,7 +51,46 @@ make rtf    # Creates output/manuscript.rtf
 
 The scripts aim to run on Linux, macOS, or Windows via Git Bash or WSL.  Ensure [Pandoc](https://pandoc.org/) is installed and on your `PATH`.
 
-### Workflow Tips
+## Log Viewer Prototype (Python)
+
+A quick terminal log viewer is available at `tools/log_viewer.py`.
+
+### Features
+- Regex-based include filtering (`--include`) with optional exclusion regex (`--exclude`), including lookaheads/lookbehinds.
+- Interactive terminal navigation: scroll, move highlighted cursor, page up/down.
+- Hashcode aliasing: repeated numeric object IDs (e.g. `[8361117]`, `HashCode=8361117`) are replaced with readable labels (`[ Alice ]`, `HashCode=Alice`) to make object lifecycles easier to follow.
+- Toggle showing only matched lines vs all lines (filtered lines rendered dimmer) using `a`.
+
+### Run
+
+```bash
+python3 tools/log_viewer.py path/to/log.txt \
+  --include '^(?=.*\[LC\])(?!.*\[FormField\]).*$'
+```
+
+Optional exclusion regex:
+
+```bash
+python3 tools/log_viewer.py path/to/log.txt \
+  --include '.*' \
+  --exclude 'GarbageCollect|Disconnected'
+```
+
+Controls:
+- `↑/↓` or `j/k`: move cursor
+- `PgUp/PgDn`: page scroll
+- `a`: toggle all lines vs matched-only
+- `q`: quit
+
+### Windows note
+
+`curses` is not bundled with CPython on Windows. Install:
+
+```bash
+pip install windows-curses
+```
+
+## Workflow Tips
 
 - Use Git to track revisions and explore alternate branches for scenes.
 - Any Markdown editor works; [Visual Studio Code](https://code.visualstudio.com/) provides helpful extensions.
@@ -60,4 +99,3 @@ The scripts aim to run on Linux, macOS, or Windows via Git Bash or WSL.  Ensure 
 ### Future Enhancements
 
 This base setup is intentionally minimal.  Future versions may add e-book targets, AI-assisted tools, or deeper IDE integration.  Contributions and ideas are welcome!
-
