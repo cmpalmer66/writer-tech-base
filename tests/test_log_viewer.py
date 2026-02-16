@@ -1,7 +1,7 @@
 import re
 import unittest
 
-from tools.log_viewer import build_records, preprocess_lines
+from tools.log_viewer import build_records, filter_lines, make_line_processor, preprocess_lines
 
 
 class LogViewerTests(unittest.TestCase):
@@ -28,6 +28,21 @@ class LogViewerTests(unittest.TestCase):
         records = build_records(processed, include, exclude)
         included = [r.text for r in records if r.included]
         self.assertEqual(included, ["[LC][A] keep"])
+
+    def test_filter_lines_for_output_mode(self):
+        lines = ["[LC][A][12345] keep\n", "[LC][FormField][12345] drop\n"]
+        processed = preprocess_lines(lines)
+        include = re.compile(r"\[LC\]")
+        exclude = re.compile(r"\[FormField\]")
+        filtered = filter_lines(processed, include, exclude)
+        self.assertEqual(filtered, ["[LC][A][ Alice ] keep\n"])
+
+    def test_stream_processor_keeps_alias_mapping(self):
+        process = make_line_processor()
+        first = process("[LC][Thing][55555] Create\n")
+        second = process("HashCode=55555 SeenAgain\n")
+        self.assertIn("[ Alice ]", first)
+        self.assertIn("HashCode=Alice", second)
 
 
 if __name__ == "__main__":

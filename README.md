@@ -60,12 +60,35 @@ A quick terminal log viewer is available at `tools/log_viewer.py`.
 - Interactive terminal navigation: scroll, move highlighted cursor, page up/down.
 - Hashcode aliasing: repeated numeric object IDs (e.g. `[8361117]`, `HashCode=8361117`) are replaced with readable labels (`[ Alice ]`, `HashCode=Alice`) to make object lifecycles easier to follow.
 - Toggle showing only matched lines vs all lines (filtered lines rendered dimmer) using `a`.
+- Batch mode: `--output` writes filtered + aliased output to a file (no interactive UI).
+- Tail mode: `--tail` follows appended lines from a file and streams filtered + aliased results.
 
 ### Run
 
 ```bash
 python3 tools/log_viewer.py path/to/log.txt \
   --include '^(?=.*\[LC\])(?!.*\[FormField\]).*$'
+```
+
+Batch output mode (non-interactive):
+
+```bash
+python3 tools/log_viewer.py path/to/log.txt \
+  --include '^(?=.*\[LC\]).*$' \
+  --exclude '\[FormField\]' \
+  --output filtered.log
+```
+
+Read from stdin (for example, piping from another tool):
+
+```bash
+cat path/to/log.txt | python3 tools/log_viewer.py - --include '.*\[LC\].*' --output filtered.log
+```
+
+Tail mode (follow a growing file; Ctrl+C to stop):
+
+```bash
+python3 tools/log_viewer.py path/to/log.txt --tail --include '.*\[LC\].*'
 ```
 
 Optional exclusion regex:
